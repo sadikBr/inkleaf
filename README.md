@@ -1,123 +1,261 @@
+<div align="center">
+
+<img src="docs/icon.png" width="96" alt="Inkleaf icon">
+
 # Inkleaf
 
-A handwritten note-taking app for Windows, Linux and Android tablets, built
-with **Qt 6** (QML and C++, ink drawn on the GPU) on a **Rust** core. It
-organizes notebooks in folders, takes pressure-sensitive ink, snaps
-hand-drawn shapes into clean ones, and stores everything locally in SQLite.
+**Handwritten notes, done properly — on your computer and your tablet.**
 
-The repository also contains the reports from studying how the Goodnotes web
-app is built (see [`docs/reverse-engineering/`](docs/reverse-engineering/README.md)).
-Inkleaf is an independent implementation informed by those findings; it contains
-no Goodnotes code, assets or branding.
+Pressure-sensitive ink, shapes that tidy themselves, maths that solves itself,
+beautiful notebooks and papers, PDF annotation, an optional AI assistant, and
+sync through your own Google Drive. Everything stays on your device.
+
+[![Latest release](https://img.shields.io/github/v/release/sadikBr/inkleaf?label=download&color=2f6b4f)](https://github.com/sadikBr/inkleaf/releases/latest)
+![Windows](https://img.shields.io/badge/Windows-10%20%2F%2011-0078d4?logo=windows&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-AppImage-f0b400?logo=linux&logoColor=white)
+![Android](https://img.shields.io/badge/Android-9%2B-3ddc84?logo=android&logoColor=white)
+[![Qt app](https://github.com/sadikBr/inkleaf/actions/workflows/qt.yml/badge.svg)](https://github.com/sadikBr/inkleaf/actions/workflows/qt.yml)
+
+[Download](#download) · [Features](#features) · [Build from source](#build-from-source) · [Changelog](CHANGELOG.md)
+
+<br>
+
+<img src="docs/screenshots/library.png" alt="The Inkleaf library: notebooks with their covers on a shelf, folders in the sidebar" width="900">
+
+</div>
+
+## Why Inkleaf
+
+- **Ink that feels like ink.** Fountain pen, ballpoint, fineliner, pencil, calligraphy and a box of brushes, drawn on the GPU with pressure, speed and smooth tapering, so it looks the same on screen, zoomed in and in exports.
+- **It tidies up after you.** Hold the pen still at the end of a stroke and a wobbly box becomes a rectangle, a circle becomes a circle and a scribble of ∫ becomes ∫. Lines snap to angles, join corners and go square or parallel to each other.
+- **Made for school.** Graphs, tables, a maths solver, a ruler, protractor and set squares, 20+ papers (Cornell, graph paper, isometric, planners…) and a full Moroccan *daftar annossous* (teacher's lesson log).
+- **Yours.** A local SQLite library, no account needed. Sync goes through a hidden folder in *your* Google Drive; notebooks can be locked with a password and encrypted end-to-end.
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/editor.png" alt="A page of physics notes with handwriting fonts, a highlighter, a circled formula, a graph and a sticky note"></td>
+    <td width="50%"><img src="docs/screenshots/editor-dark.png" alt="Algebra notes in dark mode on grid paper, with a table and a graph of a parabola"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Notes with ink, highlighter, a graph and a sticky note</sub></td>
+    <td align="center"><sub>Dark mode: tables, graphs and maths on grid paper</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/new-notebook.png" alt="The New notebook dialog with a live cover preview and cover designs"></td>
+    <td><img src="docs/screenshots/library-dark.png" alt="The library in dark mode"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Pick a cover design and colour, with a live preview</sub></td>
+    <td align="center"><sub>The library in dark mode</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/daftar-timetable.png" alt="The daftar annossous timetable page with lessons coloured by class"></td>
+    <td><img src="docs/screenshots/daftar-lessons.png" alt="A daftar lesson page with dates, class and lesson times filled in"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Daftar annossous: the timetable fills itself in</sub></td>
+    <td align="center"><sub>…and <i>New lesson</i> logs today's lesson in one tap</sub></td>
+  </tr>
+</table>
+
+## Download
+
+Get the latest version from the **[Releases page](https://github.com/sadikBr/inkleaf/releases/latest)**:
+
+| System | File | How to install |
+| --- | --- | --- |
+| **Windows 10 / 11** (64-bit) | `Inkleaf_<version>_windows_x64_setup.exe` | Run the installer. It adds Inkleaf to the Start menu and updates itself in the future. |
+| Windows, portable | `Inkleaf_<version>_windows_x64.zip` | Unzip anywhere and run `Inkleaf.exe`. No installation, no automatic updates. |
+| **Linux** (x86-64) | `Inkleaf_<version>_x86_64.AppImage` | `chmod +x Inkleaf_*.AppImage` then run it. Works on most distributions. |
+| **Android** tablets and phones (arm64, Android 9+) | `Inkleaf_<version>_android_arm64.apk` | Open the APK on the device and allow *Install unknown apps* for your browser or file manager when asked. |
+
+> [!NOTE]
+> Windows may show a SmartScreen warning because the installer isn't code-signed. Choose **More info → Run anyway**.
+
+**Updates are built in.** When a new version is out, Inkleaf shows a banner with what's new and an **Update now** button. It downloads the new version, checks it against the checksum GitHub publishes, saves your open notebook and restarts into it. The Windows installer and the AppImage update themselves, and on Android the system asks you to confirm. Automatic checks can be turned off in *Settings → Updates*.
+
+macOS and iOS aren't supported yet.
 
 ## Features
 
-- **Library:** notebooks with colour covers and live first-page previews, nested folders, favourites, search over titles and typed text, trash with recover / delete forever, duplicate, move, rename. **Select** (or Ctrl+click, Shift+click for a range, a long press) picks several notebooks and folders to favourite, move, trash, recover or delete at once (Ctrl+A, Delete, Esc)
-- **Maths:** select a sum, an equation or a function (typed, or handwritten: read by the AI, or by the computer's handwriting recognition) and press ∑. What was read shows in a field you can correct, with the answer as you type: values (2,5 × 4 = 10), checks (3 + 4 = 7 ✓), equations in one unknown (3x + 5 = 20 → x = 5; up to degree 2 exactly, numerically beyond), expansions ((x + 1)² → x² + 2x + 1). Decimal commas, ×, ÷, :, √, π, powers, |x|, degrees and Arabic digits are understood. **Write the answer** beside it (in the same size and font for typed text, in the ink's colour for handwriting), **Typeset** it, see the **Steps** (AI), or **Graph it**
-- **Graphs:** insert a graph (*Insert → Graph*) with one or more functions as you'd write them (y = x² − 2x, f(x) = 2 sin x, 1/x, √x), its window and a grid, with a live preview and Fit y. It's a page element: move it, resize it, write on it, Edit graph to change it; it's drawn the same in previews and exports
-- **More kinds** (*New → More kinds*): a **sketchbook** (blank landscape pages) and a **whiteboard** (one dotted page that grows to the right and down as you write near its edges)
-- **Tables:** draw a rough grid with the pen (a box and a few lines, or just the lines), select it and choose *Make table*: it becomes a clean table where you drew it, with what you wrote in its cells kept (typed text goes into the cells). Or *Insert → Table* and pick a size. Type in a cell with the text tool (Tab, Shift+Tab and Enter move between cells; past the end adds a row), drag the inner lines to resize columns and rows, and add or remove rows and columns or a header row from *Table* in the selection bar. Rows grow to fit their text; tapping a table selects what's written in it too, so it all moves together. Cells are searchable
-- **Pen gestures:** scribble back and forth over ink with the pen to erase it (it fades out, with *Undo* in a notice). Only ink mostly under the scribble goes; a scribble over nothing stays as ink, and letters, zigzags, circling a word or shading inside a drawing are never taken for one. Tap with two fingers to undo, three to redo. Both can be turned off in Settings → Stylus and touch
-- **My pieces:** save any selection (a diagram you draw often, a signature, a stamp, a table, a graph) with *Save to my pieces*, and put it on any page from *Insert → My pieces*. Nothing from a password-protected notebook can be saved there
-- **Side by side:** the split button shows another notebook (a textbook PDF next to your notes) to read and write in, or this one again (view only, following your edits) to look at another page. The tools act on the side you last touched, and copy and paste work between the two
-- **AI assistant** (Settings → AI, optional): use a model on your own computer (Ollama, LM Studio or any OpenAI-compatible server) or your own API key for Claude, ChatGPT or Gemini. *Ask* in the library answers from your notes (the most related pages); the ✨ button in a notebook asks about it, with ready-made questions (summarise this page or the notebook, quiz me, key points) and, in a daftar, lesson help (plan the next lesson, activities, write up a page, what's been covered). **Ask AI** on a lasso selection explains, solves step by step, summarises or translates what's selected (handwriting, text or part of a PDF), and answers can be put on the page as text. *Apply font* reads handwriting with the AI (any language, maths too). **Make handwriting searchable** reads handwritten pages in the background once you stop writing on them, so search and questions find what you wrote by hand. The API key is kept in `ai.json` in the app's data folder, readable only by you, and never goes into backups or sync; locked notebooks are never read in the background or used for library questions
-- **Passwords:** *Lock with password…* on a notebook (including imported PDFs) or a folder. Its pages, ink, text, pictures, PDF and page previews are encrypted (Argon2id key, XChaCha20-Poly1305) on the device, in backups and in Google Drive sync; another device opens it with the same password. A locked folder covers its subfolders and everything added to it later; a notebook with its own password keeps it. Unlocked items stay open until you press the lock button in the library or quit. Titles and folder names stay visible, and locked text isn't searchable. There's no recovery: a forgotten password means the content is gone
-- **Interface:** a warm, paper-inspired design with an ink-green accent, in light and dark. The library greets you, shows notebooks as books on a shelf (sortable, searchable with `/`, N for a new notebook) and has friendly empty states. In a notebook, the tools sit in three trays (writing, arranging, presenting); the active tool lifts out *dipped in its ink colour*, and tapping it again opens its options in a drawer that hangs from it (and glides along when you switch tools). The drawer tucks away as soon as you touch the page, or can be pinned open. Menus and pickers close when you click their button again. Undo/redo and page things (paper, image, instruments, pen-only) are grouped on the right beside a single *Export* button; page and zoom controls float bottom-right; the pages sidebar can be hidden (`[`); **focus mode** (`F`) leaves just the page; `?` lists every keyboard shortcut; tooltips show shortcuts. The new-notebook dialog shows a large live preview of your cover
-- **Covers:** new notebooks open with a cover page in the notebook's colour, in one of nine designs picked with live previews: *Classic* (stitched spine, elastic band, label plate), *Minimal*, *Geometric* (low-poly facets), *Waves*, *Marble* (composition book), *Leather* (embossed border, metal corners, gold title), *Kraft* (kraft paper, cloth tape, sticker label), *Dots* and *Zellige* (Moroccan eight-pointed star tilework around a cream panel). The title and month are ordinary text you can edit or write over. Your paper starts on page 2. The library shows covers full-size; *Change cover* switches design and colour (moving the title and date into place) or adds a cover to an older notebook
-- **Daftar annossous (دفتر النصوص / cahier de textes):** *New → Daftar annossous* creates a teacher's lesson log laid out like the printed books: title page (بسم الله، الجهة، المديرية الإقليمية، المؤسسة، الأستاذ(ة)، القسم، رقم التأجير، الموسم الدراسي), the teacher's card (المعلومات الشخصية / الإدارية / المهنية, diplomas, previous posts), the timetable (استعمال الزمن, with your lessons as notes), school holidays, the diagnostic report, then for each class a student list (60 numbered places) and lesson pages — التاريخ | القسم | التوقيت | طبيعة الأنشطة المنجزة | التوقيع on 5 mm squared paper with a notes strip, framed in a colour per class — and finally ministerial and academic memos and the teacher's absences. Your details are filled in wherever a page asks for them. *حصة جديدة · New lesson* writes today's date, the class and the lesson time (from your timetable; the next unlogged lesson of the day) on the next free line of that class's page, adding a page when it's full; the class chip switches classes and *Add page* continues the current class. The page button writes a *lesson outline* (التمهيد، النشاط 1، النشاط 2… or your own) down the activities column next to the lesson just started. In the daftar's ⋯ menu: *paste the student list* from Massar or Excel (Massar codes go to الرقم الوطني, names to the name column, 60 per page with pages added as needed), *export a class as PDF* for the inspector (whole year, a semester or this month), and *daftar settings* to change the details, classes, timetable and holidays later — every filled-in value is written again and new classes get a section (removed classes keep their pages). Holidays (with Morocco's fixed national holidays one click away) fill the holidays page, and New lesson asks first when today is a holiday. Headings carry a small French line
-- **Arabic text:** text boxes and sticky notes support Arabic (Noto Sans Arabic is bundled): right-to-left paragraphs, logical alignment, lists with bullets on the right; mixed Arabic/French lines are ordered correctly
-- **Paper:** 21 paper styles in six groups. *Basic:* blank, ruled, narrow ruled, wide ruled, grid, dotted. *Notes:* Cornell, legal pad, two columns, to-do list. *Maths & science:* millimetre graph paper (1 mm, 5 mm and 1 cm lines), coordinate plane on millimetre paper (axis ticks every 5 mm), isometric dots, hexagon. *Writing & art:* handwriting practice, calligraphy guide (55° slant), storyboard. *Planner:* daily and weekly. *Teacher:* daftar annossous and weekly timetable (bilingual, right to left). Every style adapts to A4, A5, US Letter, US Legal or square, portrait or landscape, and to white, cream, yellow, grey or dark paper; the picker shows them in tabs with previews. Paper style and colour can be changed per page or for all pages
-- **Pen types:** fountain pen (pressure-sensitive), ballpoint, pencil (grain texture), calligraphy (flat 45° nib) and brush pen (tapered); translucent highlighter
-- **Sync through Google Drive** (Settings → Sync): sign in once on each device (in the browser, with your Google account) and notebooks, folders and imported PDFs stay the same on your computer and tablet. Sync runs at start, every five minutes, when you close a notebook and when the tablet app is put away. Files live in Drive's hidden app folder, which only Inkleaf can see. A notebook changed on both devices keeps both versions (one as a copy); a notebook deleted for good on one device goes on the other; the notebook you're writing in is never replaced while open
-- **Updates:** the app checks GitHub Releases and, when there's a new version, shows a banner with its notes and **Update now**: it downloads the new version with a progress bar, checks it against the checksum GitHub publishes, saves the open notebook and restarts into it. On Windows (installed with the setup) the new setup runs silently and reopens Inkleaf; the AppImage replaces itself; on Android the system installer asks you to confirm (the first time, Android asks you to allow Inkleaf to install apps). A portable Windows copy or a build from source gets the download page instead. Settings → Updates: automatic checks, Check now. See [docs/RELEASING.md](docs/RELEASING.md)
-- **Android tablets:** the same app on Android, with a touch-first layout
-- **Backups** (Settings → Backups): pick a folder — a USB key, or a folder Google Drive, Dropbox or OneDrive syncs — and Inkleaf saves the whole library there once a day while it's open, as `Inkleaf backup <date time>.inkleaf`, keeping the newest 7, 14 or 30. Files are written under a temporary name and renamed when complete, so a sync client never uploads half a backup; if the folder is missing (drive unplugged) you're told and it tries again later. *Export everything* saves the library as one `.inkleaf` file anywhere; *Restore* checks a backup, shows what's in it, and replaces the library (the current one is kept as `inkleaf-before-restore.db` in the app's data folder). A backup is a SQLite snapshot, so it holds notebooks, pages, ink, imported PDFs and daftar settings
-- **Settings** (library sidebar → Settings, or ⋯ → Settings in a notebook), applied at once. *Writing:* smoothing Off / Light / Normal / Strong (each stroke keeps the smoothing it was written with; also in the pen's options), pressure Light / Normal / Firm (how hard to press for a full line), and the cursor under the pen — cross, small dot or hidden. *Stylus and touch:* the pen's side button erases or lassos while held (or does nothing), the eraser end erases, palm rejection, pen-only mode. *Appearance:* light, dark or system theme
-- **Eraser:** *Precise* (default) erases only what it touches, cutting strokes and shape outlines; *Whole stroke* removes anything it touches. Text boxes and sticky notes are erased whole
-- **Pen-only mode:** when a stylus is detected, only the pen writes; finger and mouse scroll, and two fingers pinch-zoom. Touches while the pen is writing or hovering are ignored. Palm rejection also works with pen-only mode off: touches just after the pen, or with a large contact area, are ignored, and a touch stroke already started is dropped when the pen comes down. Toggle with the pen button in the top-right; the choice is remembered
-- **Smooth, natural ink:** pens are drawn as one smooth outline with gradual width changes (no steps or beads), with sharp corners kept crisp. The fountain pen and brush pen respond to drawing speed like real ink — fuller when you slow down, thinner on quick strokes — and with a stylus its pressure leads while speed adjusts it gently. Ballpoint, pencil, highlighter and shapes keep an even width. The width is stored with the stroke, so it looks the same at any zoom and in exports
-- **Shapes:** pick line, arrow, rectangle, ellipse/circle, triangle, diamond or star and drag (Shift for squares, circles and 45° lines; optional fill)
-- **Auto shapes and ink refinement:** with the Shape tool in *Auto* mode, every stroke is cleaned up: basic shapes snap to perfect geometry; curly braces (any orientation, slanted or lopsided) are matched against a clean brace template and redrawn; near-circular runs such as parentheses become true arcs; everything else (graphs, curves, brackets…) is de-jittered and fitted with smooth curves, with straight runs made straight (snapped to horizontal/vertical when nearly so) and sharp corners kept sharp
-- **Hold to refine:** keep the pen (or mouse) down at the end of a stroke and it snaps to its refined form while you're still holding. Keep moving to rotate and resize it; hold still again to switch to moving it (and back). It's placed only when you lift. With the pens it works like the shape tool: shapes, arcs, braces, maths symbols, and otherwise a smoothed version of the stroke; write and lift without pausing and your ink is kept exactly as written
-- **Maths symbols:** hold at the end of a stroke to get a clean ∫ Σ √ ∞ (one stroke) or = ≡ ≠ ⇒ ⇔ → ↔ ≤ ≥ ± ∀ ∃ — for symbols of several strokes, the strokes you wrote just before (within a couple of seconds, right next to it) are included and replaced, in one undo step. Recognition ($P point clouds plus corner and proportion checks) ignores stroke order and direction and leaves letters and digits alone
-- **Alignment guides:** when moving text, magenta guides appear and the text snaps when its baseline or letter centre lines up with other text, sits on a ruled line or centred between two, or its ink lines up left/right/centre with other text, the margin or the page centre. Guides follow the letters, not the text box. Hold Alt to move freely
-- **PDF import and annotation:** *Import PDF* in the library turns a PDF (lecture slides, papers, worksheets…) into a notebook with one page per PDF page, at the PDF's own page size. The PDF is stored inside Inkleaf and rendered as each page's background, sharp at any zoom, so you can write, highlight, add text and shapes on top. Exports include the PDF content under your notes. PDFs are rendered on the device (Qt PDF; Android's PDF renderer), so it works offline
-- **Ruler, protractor and set squares (R):** see-through drawing instruments with real-size markings that float over the page; pick one from the ruler button's menu (R shows or hides the last one). Drag to move; rotate by dragging a round grip, scrolling the wheel over it (1° per notch, 15° with Shift) or twisting with two fingers; it snaps to common angles. Pen, highlighter and shape strokes started next to an edge lock to it, with the ink against the edge and a live readout: length in cm along straight edges, swept angle along the protractor's curved edge. The 30 cm *ruler* has mm/cm scales; the *protractor* has 0–180° scales (both directions) and two arms you drag to measure an angle; the *set squares* (45° and 30°/60°) have cm scales on both legs and work along all three edges. Only the instrument's body takes input, so you can draw right next to it. Instruments are never part of the page or exports
-- **Laser pointer (K):** for presenting and explaining. *Trail* draws a glowing tube (bright colour with a white core, fuller when you move slowly and slimmer on fast sweeps) that stays while you keep drawing; shortly after you stop, the colour fades and then the core (drawing again during the fade brings it back). *Dot* is a small pointer that follows the pen or mouse. Red, green, blue, purple or orange (or any colour). It is drawn incrementally on its own layers, so it stays smooth however much you draw. Nothing is ever added to the page, undo history or exports; in pen-only mode the mouse can still use it
-- **Objects:** text boxes, sticky notes, images (insert or paste)
-- **Text formatting:** bold, italic, bulleted and numbered lists (Enter continues the list, wrapped lines indent under the text) and left/centre/right alignment, per text box or sticky note; Ctrl+B / Ctrl+I while typing
-- **Fonts:** eleven presets for typed text. Typed: Clean (Inter) and Book (Lora, a serif), both with real bold and italic. Handwriting: Friendly (Playpen Sans), Natural (Mynerve), School print (Andika), French cursive (Playwrite FR Moderne), Classic cursive (Playwrite FR Trad), Marker (Shantell Sans), Chalkboard (Schoolbell), Quick notes (Gochi Hand) and Neat (Handlee). All cover French accents; characters a font lacks (such as ² or ½) come from Inter, on screen and in PDF exports alike. Text written in the earlier fonts shows in the closest new one. Pick one before or while typing, or lasso-select text boxes and sticky notes and change the font or size (A− / A+) from the selection bar. The fonts are bundled, so they work offline (SIL Open Font License)
-- **Tool options:** each tool keeps a compact bar of its own **5 favourite colours and 3 favourite sizes**, remembered between sessions. Tap a favourite to use it; tap it again (or the rainbow button) to swap it for a palette colour or any custom colour; the size chip opens a slider with exact values. The pen type and shape kind are one chip with a picture menu, and text lists and alignment sit behind one chip
-- **Colours:** palette colours plus a custom colour picker (saturation/brightness square, hue slider, hex code, recently used colours and, where the system supports it, an eyedropper) for every tool and for recolouring a selection
-- **Sizes:** each tool shows its exact size in px, with one-tap presets, − / + buttons and a box to type a value. Sizes are remembered
-- **Lasso:** draw around items or tap one to select it; move, recolour, duplicate, copy/paste, delete
-- **Resize and rotate anything:** any selection (handwriting, shapes, text, sticky notes, images, or a mix) gets a box with resize handles and a rotation knob below it. Corners keep proportions, edges stretch (Shift keeps proportions on edges too); rotation snaps to 15° with Shift. Text scales its font size; text, sticky notes and images can be rotated
-- **Edit shapes:** a selected shape's bar changes its type, line width (exact px), fill and colour; a selected line or arrow has handles on both ends
-- **Apply a font to handwriting:** lasso-select pen writing (e.g. a title) and choose *Apply font*. On Windows the built-in offline handwriting recognizer (Windows Ink) reads the words and suggests alternatives; you can correct the text, preview it in every handwriting font, and it replaces the ink at the same place and size (optionally keeping the ink). Elsewhere you type what you wrote
-- **Pages:** all pages scroll continuously in one column; write on any page directly (it becomes the current page), and the page in view becomes current when scrolling stops. Sidebar thumbnails, add / insert / duplicate / reorder / delete / bookmark; undo history is kept per page
-- **Editing:** undo/redo, zoom (Ctrl+wheel, pinch, fit width; zoomed in far, only the visible part of the page is drawn, so big and HiDPI screens stay fast), pan tool
-- **Export:** PDF (whole notebook or one page), PowerPoint .pptx (one slide per page) or PNG, through the system's Save dialog. PDFs are vector: handwriting, shapes and text stay sharp at any zoom. PowerPoint and PNG exports are high-resolution images
-- **Themes:** light and dark mode
+### Writing and drawing
+
+- **Pens:** fountain pen (pressure and speed sensitive), ballpoint, fineliner, pencil with grain and a flat-nib calligraphy pen. Solid, dashed or dotted lines.
+- **Brushes:** brush pen, ink brush, flat brush, airbrush, marker, watercolour, neon, chalk, crayon and washi tape. Plus a translucent highlighter that draws straight lines when you hold it.
+- **Smooth, honest ink:** one smooth outline per stroke with crisp corners. Smoothing and pressure are adjustable, and every stroke keeps its look at any zoom and in exports.
+- **Eraser:** *precise* (cuts strokes) or *whole stroke*. It grows when you rub fast. You can also **scribble over ink** with the pen to erase it.
+- **Lasso and selection:** move, resize, rotate, recolour, duplicate, copy and paste anything. Arrow keys nudge it. Press and hold on handwriting to select a word.
+- **Palm rejection and pen-only mode** for tablets with a stylus. The pen's side button and eraser end work too. Two-finger tap undoes and three-finger tap redoes.
+- **Write from your phone:** no touch screen? Scan a QR code and your phone becomes a writing pad for the page on your computer. Nothing to install.
+
+### Shapes, geometry and maths
+
+- **Hold to refine:** hold still at the end of a stroke and it becomes a clean line, arc, box, circle, triangle, brace or maths symbol (∫ Σ √ ∞ ≠ ⇒ ≤ ± ∀ …). Keep holding to rotate and resize it before you lift.
+- **22 shapes** in a tile picker (arrows, polygons, stars, hearts, clouds, speech bubbles…), with fill and dashes. Marks for equal sides and right angles.
+- **Drafting help:** lines settle on round angles, join nearby ends, go square or parallel to other lines, and show their angle and length in cm. Tap to place named points A, B, C. **Make it neat** turns a rough drawing into clean shapes in one step.
+- **Ruler, protractor and set squares** with real-size markings. Strokes drawn along an edge follow it, with a live length or angle readout.
+- **Maths solver:** select a sum, an equation or a function (typed or handwritten) and press ∑. You get the value, a ✓ check, the solution of an equation in one unknown, or an expansion. Then write the answer next to it, typeset it, see the steps or graph it.
+- **Graphs:** *Insert → Graph* plots one or more functions (y = x² − 2x, f(x) = 2 sin x…) as a page element you can write on.
+- **Tables:** draw a rough grid and choose *Make table*, or insert one. Type in the cells, resize rows and columns, and add a header row.
+
+### Notebooks, pages and paper
+
+- **Library:** notebooks on a shelf with full-size covers, nested folders, favourites, search over titles, typed text, PDFs and AI-read handwriting, and a trash. Multi-select works too.
+- **15 cover designs** (Classic, Leather, Kraft, Marble, Zellige, Arabesque, Berber rug, Botanical, Terrazzo, Sunrise, Blueprint…) in any colour, with the title on the cover.
+- **20+ paper styles:** blank, ruled (narrow and wide), grid, dotted, Cornell, legal pad, two columns, to-do, millimetre graph paper, coordinate plane, isometric, hexagon, handwriting practice, calligraphy guide, storyboard, and daily and weekly planners. They come in A4, A5, Letter, Legal or square, portrait or landscape, on white, cream, yellow, grey or dark paper. **Save any page as your own template.**
+- **More kinds:** sketchbooks (blank landscape) and an endless **whiteboard** that grows as you write near its edges.
+- **Pages:** continuous scrolling, thumbnails, an *All pages* grid with drag-to-reorder, bookmarks, a contents panel and contents page, links between pages, and *Recently deleted* for 30 days.
+- **Text:** text boxes and sticky notes with bold, italic, lists and alignment, and **11 bundled fonts** (Inter, Lora and 9 handwriting fonts). Full **Arabic** and right-to-left support.
+- **Pictures:** insert, paste, crop to a rectangle, rounded or circle shape. **My pieces** keeps any selection (a diagram, a signature, a stamp) to reuse anywhere.
+- **Side by side:** open a textbook PDF next to your notes and write in both.
+
+### PDFs, export and presenting
+
+- **Import PDFs** (slides, papers, worksheets) and annotate them. Pages render sharply at any zoom, offline.
+- **Export** a notebook, a page or just a selection as a **vector PDF** (with its contents in the reader's sidebar), **PowerPoint** or **PNG**, including transparent PNGs.
+- **Present** (F5): the page goes full screen on a projector while your tools stay on your screen. There's a **laser pointer** with a glowing trail or a dot.
+- **Find in a notebook** (Ctrl+F) across typed text, tables, PDF text and AI-read handwriting.
+
+### For teachers: daftar annossous (دفتر النصوص / cahier de textes)
+
+*New → Daftar annossous* creates a complete Moroccan lesson log laid out like the printed books. It has a bilingual title page, the teacher's card, the timetable, holidays, a diagnostic report, a student list and lesson pages per class (each class in its own colour), memos and absences.
+
+- **New lesson** writes today's date, class and lesson time from your timetable on the next free line, adding pages as needed. A lesson outline goes in with one tap.
+- **Paste the student list** from Massar or Excel.
+- **Export a class as PDF** for the inspector: the whole year, a semester or a month.
+- Holidays (with Morocco's national holidays a click away) fill themselves in, and *New lesson* warns you on a holiday.
+
+### AI assistant (optional)
+
+Bring your own model: **a local one** (Ollama, LM Studio or any OpenAI-compatible server) or **your own API key** for Claude, ChatGPT or Gemini (*Settings → AI*).
+
+- **Ask** about your notes in any language. Answers come from your pages, PDFs and handwriting.
+- On a selection: **explain, solve step by step, summarise, translate, check spelling**, or turn handwriting into typed text in a handwriting font.
+- The assistant can also **make things for you**: worksheets, summaries, tables, notebooks and folders, and daftar lessons following your timetable. It always shows the plan first, and one *Undo* takes it all back.
+- *Make handwriting searchable* reads handwritten pages in the background.
+- Your API key stays on your device (never in backups or sync). Locked notebooks are never read.
+
+### Sync, backups and privacy
+
+- **Google Drive sync** keeps your computer, tablet and phone the same. Files live in Drive's hidden app folder, which only Inkleaf can see. Conflicts keep both versions.
+- **Daily backups** to any folder (a USB key, or a Dropbox or OneDrive folder), keeping the newest 7, 14 or 30. Use *Export everything* and *Restore* to move or recover a library.
+- **Password lock** for notebooks and folders: content is encrypted with Argon2id and XChaCha20-Poly1305 on the device, in backups and in sync. There's no recovery if you forget the password.
 
 ### Keyboard shortcuts
 
 | Key | Action | Key | Action |
 | --- | --- | --- | --- |
 | P | Pen | Ctrl+Z / Ctrl+Shift+Z | Undo / redo |
-| H | Highlighter | Ctrl+C / Ctrl+V / Ctrl+D | Copy / paste / duplicate selection |
-| E | Eraser | Delete | Delete selection |
-| L | Lasso | Ctrl+A | Select all |
-| S | Shape | Ctrl+= / Ctrl+- / Ctrl+0 | Zoom in / out / fit |
-| T | Text box | ← / → (PgUp / PgDn) | Previous / next page |
-| N | Sticky note | Esc | Clear selection / finish text |
+| B | Brush | Ctrl+C / Ctrl+V / Ctrl+D | Copy / paste / duplicate |
+| H | Highlighter | Delete | Delete selection |
+| E | Eraser | Ctrl+A | Select all |
+| L | Lasso | Ctrl+F | Find in notebook |
+| S | Shape | Ctrl+= / Ctrl+- | Zoom in / out |
+| T | Text box | Ctrl+0 / Ctrl+9 | Fit width / whole page |
+| N | Sticky note | ← / → (PgUp / PgDn) | Previous / next page |
+| K | Laser pointer | F5 | Present |
+| R | Ruler and instruments | F | Focus mode |
+| Z | Zoom box | `[` | Show / hide pages |
+| `/` | Search the library | `?` | Every shortcut and gesture |
 
-## Project layout
+## Build from source
 
-```
-qt/                   The app (Qt 6: QML screens, C++); see qt/README.md
-  src/editor/         The editor: gestures, selection, undo, text, instruments
-  src/draw/           Drawing: papers, covers, daftar pages, pens, shapes, text
-  src/daftar/         The daftar annossous and cover setup
-  src/tests/          Self-tests and the reference results' checks
-  tests/golden/       Reference results (recorded by CI)
-  native/             The C interface to the Rust core
-core/                 Rust core: SQLite library, ink, shape and symbol recognition,
-                      export (PDF/PPTX), backups, Google Drive sync, handwriting
-                      recognition (Windows Ink)
-docs/                 Release guide, web pages (privacy, terms),
-                      reverse-engineering/ (Goodnotes web architecture reports)
-```
+Inkleaf is a **Qt 6** app (QML and C++, with ink drawn on the GPU) on a **Rust** core (SQLite library, ink geometry, recognition, export, sync). CMake builds both; there's no Node or script step.
 
-## Development
+**You'll need** Qt 6.5+ (Quick, Controls, Svg and PDF; CI uses 6.8.3), CMake 3.21+, a C++17 compiler and Rust stable.
 
-Prerequisites: Qt 6.5+ (Quick, Controls, Svg, PDF), CMake and Rust stable.
-On Arch: `sudo pacman -S --needed qt6-base qt6-declarative qt6-svg qt6-webengine cmake base-devel rustup`.
+### Linux
 
 ```bash
+# Arch
+sudo pacman -S --needed qt6-base qt6-declarative qt6-svg qt6-webengine cmake base-devel rustup
+rustup default stable
+
+# Ubuntu / Debian
+sudo apt install qt6-base-dev qt6-declarative-dev qt6-svg-dev qt6-pdf-dev cmake build-essential \
+  qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtquick-window \
+  qml6-module-qtquick-templates qml6-module-qtquick-dialogs qml6-module-qt-labs-folderlistmodel \
+  qml6-module-qt-labs-settings qml6-module-qtqml-workerscript
+curl https://sh.rustup.rs -sSf | sh
+
+# Build and run
 cmake -S qt -B build/qt -DCMAKE_BUILD_TYPE=Release
 cmake --build build/qt -j
 ./build/qt/inkleaf
 ```
 
-Tests:
+(On Arch, `qt6-webengine` is the package that provides Qt PDF.)
 
-```bash
-cargo test -p inkleaf-core             # Rust core (database, ink, recognition, export, sync)
-QT_QPA_PLATFORM=offscreen ./build/qt/inkleaf --self-test   # C++ tests (geometry, lists, guides, daftar…)
-QT_QPA_PLATFORM=offscreen ./build/qt/inkleaf --golden check qt/tests/golden   # same results as recorded
-QT_QPA_PLATFORM=offscreen ./build/qt/inkleaf --smoke   # the app starts and its screens load
+### Windows
+
+Install [Qt 6.8](https://www.qt.io/download-qt-installer) for **MSVC 2022 64-bit** with the *Qt PDF* module, plus [Visual Studio 2022](https://visualstudio.microsoft.com/) (Desktop C++), [Rust](https://rustup.rs) and Ninja. Then, in a *x64 Native Tools Command Prompt* with Qt's `bin` folder on the `PATH`:
+
+```bat
+cmake -S qt -B build/qt -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build/qt
+windeployqt --release --qmldir qt/qml build/qt/inkleaf.exe
+build\qt\inkleaf.exe
 ```
 
-The reference results are recorded by CI (on its Qt version; text can measure
-a hair differently on others). After an intended change to drawing, the
-editor or the daftar, run **Actions → Record reference results**: it records
-them again and commits them.
+### Android
 
-Data lives in the OS app-data directory (e.g. `~/.local/share/app.inkleaf.desktop/inkleaf.db`
-on Linux); `INKLEAF_DATA_DIR=/some/folder` uses another one.
+You need Qt for Android (arm64-v8a) along with the desktop Qt as the host, the Android SDK, NDK 26.1, JDK 17 and `rustup target add aarch64-linux-android`:
+
+```bash
+"$QT_ANDROID/bin/qt-cmake" -S qt -B build/android -G Ninja -DCMAKE_BUILD_TYPE=Release \
+  -DQT_HOST_PATH="$QT_DESKTOP" -DANDROID_SDK_ROOT="$ANDROID_HOME" -DANDROID_NDK_ROOT="$NDK_HOME"
+cmake --build build/android --target apk
+```
+
+### Good to know
+
+- **No build needed to try the latest code:** every push to `main` runs **Actions → Qt app**, and its run artifacts include the AppImage, the Windows installer and zip, and the APK.
+- **Your data** lives in the OS app-data folder (on Linux, `~/.local/share/app.inkleaf.desktop/inkleaf.db`). Set `INKLEAF_DATA_DIR=/some/folder` to use another library, for example to test.
+- **Google Drive sync** in your own build needs `INKLEAF_GOOGLE_CLIENT_ID` and `INKLEAF_GOOGLE_CLIENT_SECRET` set at build time. See [docs/RELEASING.md](docs/RELEASING.md).
+- `INKLEAF_WINDOW_SIZE=1000x700` opens the window at a given size (handy for checking phone layouts).
+
+### Tests
+
+```bash
+cargo test -p inkleaf-core                                                     # Rust core: database, ink, recognition, export, sync
+QT_QPA_PLATFORM=offscreen ./build/qt/inkleaf --self-test                       # C++ tests: geometry, lists, guides, daftar…
+QT_QPA_PLATFORM=offscreen ./build/qt/inkleaf --golden check qt/tests/golden    # drawing and editor match the recorded results
+QT_QPA_PLATFORM=offscreen ./build/qt/inkleaf --smoke                           # the app starts and its screens load
+```
+
+The reference results in `qt/tests/golden` are recorded by CI on its Qt version, and text can measure a hair differently on others. After an intended change to drawing, the editor or the daftar, run **Actions → Record reference results** to record and commit them again.
+
+### Releasing
+
+Bump the version with `python3 scripts/set-version.py X.Y.Z`, add a `## X.Y.Z` section to [CHANGELOG.md](CHANGELOG.md), then commit, tag `vX.Y.Z` and push. The **Release** workflow builds the AppImage, the Windows installer and zip and the signed APK, attaches them to a GitHub release, and installed apps offer the update. One-time setup (Android signing key, Google sign-in) is in [docs/RELEASING.md](docs/RELEASING.md).
+
+## Project layout
+
+```
+qt/                   The app (Qt 6: QML screens, C++), see qt/README.md
+  qml/                Screens (Library, Editor, Settings…), theme, icons
+  src/editor/         The editor: tools, gestures, selection, undo, text, instruments
+  src/draw/           Drawing: papers, covers, daftar pages, pens, shapes, text
+  src/daftar/         The daftar annossous and cover setup
+  src/math/           The maths solver and graphs
+  src/tests/          Self-tests and the reference results' checks
+  tests/golden/       Reference results (recorded by CI)
+  native/             The C interface to the Rust core
+  packaging/          Windows installer, Linux desktop files
+core/                 Rust core: SQLite library, ink, shape and symbol recognition,
+                      export (PDF/PPTX/PNG), backups, Google Drive sync, AI,
+                      encryption, handwriting recognition (Windows Ink)
+docs/                 Release guide, web pages (privacy, terms), screenshots,
+                      reverse-engineering/ (Goodnotes web architecture reports)
+scripts/              Versioning and release-notes helpers
+```
 
 ## Not implemented yet
 
-Collaboration, and handwriting recognition outside Windows.
-[Report 05](docs/reverse-engineering/05-inkleaf-mapping.md) explains how each
-could be added.
+Real-time collaboration, and offline handwriting recognition outside Windows (reading handwriting with the AI works everywhere). [Report 05](docs/reverse-engineering/05-inkleaf-mapping.md) explains how each could be added.
+
+## About this repository
+
+The repository also contains the reports from studying how the Goodnotes web app is built (see [`docs/reverse-engineering/`](docs/reverse-engineering/README.md)). Inkleaf is an independent implementation informed by those findings. It contains no Goodnotes code, assets or branding.
