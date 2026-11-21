@@ -17,7 +17,7 @@ on:
   workflow_call:
     inputs:
       release:
-        description: "Building a release: the APK must be signed."
+        description: "Building a release (the APK is signed: with the real key, or a temporary one without the secrets)."
         type: boolean
         default: false
 
@@ -155,7 +155,11 @@ jobs:
         run: |
           mkdir -p dist/Inkleaf
           cp build/qt/inkleaf.exe dist/Inkleaf/Inkleaf.exe
-          windeployqt --release --qmldir qt/qml --no-translations --compiler-runtime dist/Inkleaf/Inkleaf.exe
+          windeployqt --release --qmldir qt/qml --no-translations dist/Inkleaf/Inkleaf.exe
+          # Microsoft's C++ runtime goes next to the app (windeployqt would only add
+          # vc_redist.x64.exe, which nothing runs), so it starts on PCs without it.
+          crt=$(ls -d "$(cygpath -u "$VCToolsRedistDir")"/x64/Microsoft.VC*.CRT | head -n 1)
+          test -n "$crt" && cp "$crt"/*.dll dist/Inkleaf/
           # Left out, as Inkleaf never uses them: Direct3D 12's shader
           # compiler (Qt Quick draws with Direct3D 11 on Windows) and the
           # Qt Quick Controls styles other than Basic (the app's own style,
@@ -172,6 +176,11 @@ jobs:
           if [ -s ../removed-but-needed.txt ]; then echo "::error::still needed:"; cat ../removed-but-needed.txt; exit 1; fi
           grep -rlE 'QtQuick\.Controls\.(Fusion|Material|Universal|Imagine|FluentWinUI3|Windows|iOS|macOS)' qml --include=qmldir | grep -v '^qml/QtQuick/Controls/qmldir$' > ../style-imports.txt || true
           if [ -s ../style-imports.txt ]; then echo "::error::modules import a removed style:"; cat ../style-imports.txt; exit 1; fi
+          # The C++ runtime everything uses is in the folder (this PC has it installed,
+          # so the start below wouldn't notice it missing).
+          for dll in $(dumpbin //dependents $(find . -name '*.dll' -o -name '*.exe') | grep -ioE '(msvcp|vcruntime|concrt)140[a-z0-9_]*\.dll' | sort -fu); do
+            ls | grep -qix "$dll" || { echo "::error::$dll is needed but not in the folder"; exit 1; }
+          done
           cd ../..
           # It starts (window, scripts and dialogs load), without the Qt
           # installed here, so a module missing from the folder fails.

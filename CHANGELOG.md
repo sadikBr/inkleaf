@@ -5,6 +5,10 @@ Updates → What's new) and on its GitHub release. Keep them short, one line
 per change, written for the people using Inkleaf. A release needs its
 section here before it can be published (`scripts/check-version.py`).
 
+## 0.22.2
+
+- Windows: Inkleaf now starts on PCs that don't have Microsoft's Visual C++ runtime installed (it failed with "VCRUNTIME140_1.dll was not found"); the runtime now comes with the app.
+
 ## 0.22.1
 
 - Inkleaf now lives at github.com/sadikBr/inkleaf: updates, the website and the links in the app point there.
