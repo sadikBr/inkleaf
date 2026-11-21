@@ -5,6 +5,11 @@ Updates → What's new) and on its GitHub release. Keep them short, one line
 per change, written for the people using Inkleaf. A release needs its
 section here before it can be published (`scripts/check-version.py`).
 
+## 0.22.1
+
+- Inkleaf now lives at github.com/sadikBr/inkleaf: updates, the website and the links in the app point there.
+- Fixed the Windows build with the newest Rust toolchain (it needs Windows' Synchronization library).
+
 ## 0.22.0
 
 - **Arcs:** draw part of a circle and hold still: it becomes a clean arc, with its centre, and a label giving its radius and angle ("r 3.4 cm  105°").

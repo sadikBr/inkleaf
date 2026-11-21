@@ -14,7 +14,7 @@ QtObject {
     /// Saves the open notebook; returns its id (sync leaves it alone) or "".
     property var prepare: function () { return "" }
 
-    readonly property string repo: "sadikBr/goodnotes-clone"
+    readonly property string repo: "sadikBr/inkleaf"
     readonly property string version: Qt.application.version
 
     function pad(n) { return (n < 10 ? "0" : "") + n }

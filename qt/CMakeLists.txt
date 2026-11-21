@@ -285,7 +285,7 @@ endif()
 if(WIN32)
   target_compile_definitions(inkleaf PRIVATE _USE_MATH_DEFINES)  # M_PI
   target_sources(inkleaf PRIVATE packaging/inkleaf.rc)  # the app icon
-  target_link_libraries(inkleaf PRIVATE ws2_32 userenv bcrypt ntdll advapi32 ole32 oleaut32 runtimeobject propsys shell32 crypt32 secur32 ncrypt)
+  target_link_libraries(inkleaf PRIVATE ws2_32 userenv bcrypt ntdll advapi32 ole32 oleaut32 runtimeobject propsys shell32 crypt32 secur32 ncrypt synchronization)
   set_target_properties(inkleaf PROPERTIES WIN32_EXECUTABLE ON)
 endif()
 

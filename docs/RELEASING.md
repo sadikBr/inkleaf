@@ -47,12 +47,12 @@ and allow "Install unknown apps" for the browser or file manager when asked.
    - First publish the app's web pages (home, privacy policy, terms, in
      `docs/`): on GitHub, **Settings → Pages → Build and deployment**, Source
      *Deploy from a branch*, branch `main`, folder `/docs`, Save. After a
-     minute they are at `https://sadikbr.github.io/goodnotes-clone/`.
+     minute they are at `https://sadikbr.github.io/inkleaf/`.
    - Branding: app name *Inkleaf*, your email as support and developer contact,
      and under App domain:
-     - Application home page: `https://sadikbr.github.io/goodnotes-clone/`
-     - Privacy policy: `https://sadikbr.github.io/goodnotes-clone/privacy.html`
-     - Terms of service: `https://sadikbr.github.io/goodnotes-clone/terms.html`
+     - Application home page: `https://sadikbr.github.io/inkleaf/`
+     - Privacy policy: `https://sadikbr.github.io/inkleaf/privacy.html`
+     - Terms of service: `https://sadikbr.github.io/inkleaf/terms.html`
      - Authorized domain: `sadikbr.github.io`
    - Audience: *External*. Then **Publish app** (in "Testing", Google ends
      sign-ins after 7 days and only allows listed test users).
