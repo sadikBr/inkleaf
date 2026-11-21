@@ -4,6 +4,7 @@
 #
 # Needs (repository Settings → Secrets and variables → Actions):
 #   (Android) secrets ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+#     (without them the APK is signed with a temporary key: it installs, but not over an existing copy)
 #   (Drive sync) secrets GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 name: Release
 

@@ -228,7 +228,7 @@ jobs:
           arch: android_arm64_v8a
           extra: --autodesktop
           cache: true
-      - name: Signing key (when the Android secrets are set)
+      - name: Signing key (the Android secrets; a temporary key for a release without them)
         env:
           KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
@@ -236,7 +236,15 @@ jobs:
             echo "$KEYSTORE" | base64 -d > "$RUNNER_TEMP/inkleaf.jks"
             echo "SIGN=ON" >> "$GITHUB_ENV"
           elif [ "${{ inputs.release }}" = "true" ]; then
-            echo "::error::A release needs the Android signing secrets (ANDROID_KEYSTORE_BASE64 and the others)"; exit 1
+            # No signing secrets yet: a key made just for this build, so the APK still
+            # installs. Android won't put it over a copy signed with the real key (and
+            # the next one signed with the real key won't go over this one): set the
+            # secrets for releases people update.
+            echo "::warning::No Android signing secrets: this APK is signed with a temporary key, so it won't install over an existing Inkleaf (uninstall first). Add ANDROID_KEYSTORE_BASE64 and the others for normal releases."
+            pass=$(openssl rand -hex 16); echo "::add-mask::$pass"
+            keytool -genkeypair -keystore "$RUNNER_TEMP/inkleaf.jks" -alias inkleaf-temp -keyalg RSA -keysize 2048 -validity 3650 \
+              -storepass "$pass" -keypass "$pass" -dname "CN=Inkleaf (temporary key)" -noprompt
+            { echo "SIGN=ON"; echo "TEMP_KEY_ALIAS=inkleaf-temp"; echo "TEMP_KEY_PASS=$pass"; } >> "$GITHUB_ENV"
           else
             echo "SIGN=OFF" >> "$GITHUB_ENV"
           fi
@@ -245,9 +253,9 @@ jobs:
           INKLEAF_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           INKLEAF_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           QT_ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/inkleaf.jks
-          QT_ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          QT_ANDROID_KEYSTORE_STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          QT_ANDROID_KEYSTORE_KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          QT_ANDROID_KEYSTORE_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || env.TEMP_KEY_ALIAS }}
+          QT_ANDROID_KEYSTORE_STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || env.TEMP_KEY_PASS }}
+          QT_ANDROID_KEYSTORE_KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD || env.TEMP_KEY_PASS }}
         run: |
           host=$(ls -d "$QT_ROOT_DIR"/../gcc_64 | head -n 1)
           "$QT_ROOT_DIR/bin/qt-cmake" -S qt -B build/android -G Ninja -DCMAKE_BUILD_TYPE=Release \
